@@ -131,11 +131,8 @@ class Event {
       // On Android, the datetime in an allDay event is adjusted to local
       // timezone, which can result in the wrong day, so we need to bring the
       // date back to midnight UTC to get the correct date
-      var startOffset = start?.timeZoneOffset.inMilliseconds ?? 0;
-      var endOffset = end?.timeZoneOffset.inMilliseconds ?? 0;
-      // subtract the offset to get back to midnight on the correct date
-      start = start?.subtract(Duration(milliseconds: startOffset));
-      end = end?.subtract(Duration(milliseconds: endOffset));
+      start = start?.toUtc();
+      end = end?.toUtc();
       // The Event End Date for allDay events is midnight of the next day, so
       // subtract one day
       end = end?.subtract(const Duration(days: 1));
