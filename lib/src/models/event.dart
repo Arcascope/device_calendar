@@ -49,6 +49,8 @@ class Event {
   /// Indicates if this event is of confirmed, canceled, tentative or none status
   EventStatus? status;
 
+  final DateTime _dateTime = DateTime.now();
+
   ///Note for development:
   ///
   ///JSON field names are coded in dart, swift and kotlin to facilitate data exchange.
@@ -136,6 +138,9 @@ class Event {
       // The Event End Date for allDay events is midnight of the next day, so
       // subtract one day
       end = end?.subtract(const Duration(days: 1));
+    } else if ((allDay ?? false)) {
+      start = start!.add(_dateTime.timeZoneOffset);
+      end = end!.add(_dateTime.timeZoneOffset);
     }
     location = json['eventLocation'];
     availability = parseStringToAvailability(json['availability']);
