@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart';
 
@@ -79,6 +80,8 @@ class DeviceCalendarPlugin {
     String? calendarId,
     RetrieveEventsParams? retrieveEventsParams,
   ) async {
+    final String timeZone = await FlutterNativeTimezone.getLocalTimezone();
+    final locationTimeZone = getLocation(timeZone);
     return _invokeChannelMethod(ChannelConstants.methodNameRetrieveEvents,
         assertParameters: (result) {
           _validateCalendarIdParameter(
@@ -118,7 +121,7 @@ class DeviceCalendarPlugin {
               json.decode(rawData).map<Event>((decodedEvent) {
                 // debugPrint(
                 //     "JSON_RRULE: ${decodedEvent['recurrenceRule']}, ${(decodedEvent['recurrenceRule']['byday'])}");
-                return Event.fromJson(decodedEvent);
+                return Event.fromJson(decodedEvent,locationTimeZone);
               }),
             ));
   }

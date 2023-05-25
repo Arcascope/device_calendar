@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:collection/collection.dart';
+import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 
 import '../../device_calendar.dart';
 import '../common/error_messages.dart';
@@ -80,7 +81,7 @@ class Event {
   ///
   ///Sample JSON:
   ///{calendarId: 00, eventId: 0000, eventTitle: Sample Event, eventDescription: This is a sample event, eventStartDate: 1563719400000, eventStartTimeZone: Asia/Hong_Kong, eventEndDate: 1640532600000, eventEndTimeZone: Asia/Hong_Kong, eventAllDay: false, eventLocation: Yuenlong Station, eventURL: null, availability: BUSY, attendees: [{name: commonfolk, emailAddress: total.loss@hong.com, role: 1, isOrganizer: false, attendanceStatus: 3}], reminders: [{minutes: 39}]}
-  Event.fromJson(Map<String, dynamic>? json) {
+  Event.fromJson(Map<String, dynamic>? json, Location timeZone) {
     if (json == null) {
       throw ArgumentError(ErrorMessages.fromJsonMapIsNull);
     }
@@ -129,18 +130,32 @@ class Event {
         ? TZDateTime.fromMillisecondsSinceEpoch(endLocation, endTimestamp)
         : TZDateTime.now(local);
     allDay = json['eventAllDay'] ?? false;
+
+    print(timeZone);
+
     if (Platform.isAndroid && (allDay ?? false)) {
       // On Android, the datetime in an allDay event is adjusted to local
       // timezone, which can result in the wrong day, so we need to bring the
       // date back to midnight UTC to get the correct date
+
       start = start?.toUtc();
       end = end?.toUtc();
       // The Event End Date for allDay events is midnight of the next day, so
       // subtract one day
-      end = end?.subtract(const Duration(days: 1));
+      end = end?.subtract(const Duration(minutes: 1));
+      start = TZDateTime(timeZone, start!.year, start!.month, start!.day,
+          start!.hour, start!.day);
+      end = TZDateTime(
+          timeZone, end!.year, end!.month, end!.day, end!.hour, end!.day);
     } else if ((allDay ?? false)) {
       start = start!.add(_dateTime.timeZoneOffset);
       end = end!.add(_dateTime.timeZoneOffset);
+      end = end!.subtract(const Duration(minutes: 1));
+
+      start = TZDateTime(timeZone, start!.year, start!.month, start!.day,
+          start!.hour, start!.day);
+      end = TZDateTime(
+          timeZone, end!.year, end!.month, end!.day, end!.hour, end!.day);
     }
     location = json['eventLocation'];
     availability = parseStringToAvailability(json['availability']);
