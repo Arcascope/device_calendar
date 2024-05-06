@@ -332,7 +332,7 @@ class CalendarDelegate(binding: ActivityPluginBinding?, context: Context) :
         values.put(CalendarContract.Calendars.ACCOUNT_TYPE, CalendarContract.ACCOUNT_TYPE_LOCAL)
         values.put(
             CalendarContract.Calendars.CALENDAR_ACCESS_LEVEL,
-            CalendarContract.Calendars.CAL_ACCESS_OWNER
+            CalendarContract.Calendars.CAL_ACCESS_READ
         )
         values.put(
             CalendarContract.Calendars.CALENDAR_COLOR, Color.parseColor(
